@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Backend API
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgres://diu:diu_password@db:5432/physics_tutorial
+      - RUST_LOG=debug
+    depends_on:
+      - db
+    networks:
+      - diu-network
+
+  # Frontend (for production)
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "5173:80"
+  #   networks:
+  #     - diu-network
+
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: diu
+      POSTGRES_PASSWORD: diu_password
+      POSTGRES_DB: physics_tutorial
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - diu-network
+
+volumes:
+  postgres_data:
+
+networks:
+  diu-network:
+    driver: bridge
